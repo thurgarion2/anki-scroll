@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from abc import ABC, abstractmethod
-from typing import Iterator
+from typing import Iterator, Optional
 
 
 class Card(BaseModel):
@@ -41,7 +41,33 @@ class CardGenerator(ABC):
 
 class SimpleDeck(Deck):
     """simple in memory implementation of a deck"""
+
+    def __init__(self) -> None:
+        self._cards: list[Card] = []
+
+    def add(self, card: Card):
+        # prevent storing the exact same card instance twice
+        if any(existing is card for existing in self._cards):
+            return
+        self._cards.append(card)
+
+    def remove(self, card: Card):
+        try:
+            self._cards.remove(card)
+        except ValueError:
+            pass
+
+    def __iter__(self) -> Iterator[Card]:
+        return iter(tuple(self._cards))
     
-class SimpleCardGenerator(ABC):
+class SimpleCardGenerator(CardGenerator):
     """a simple gnerator that generate always the same card"""
 
+    def __init__(
+        self,
+        card: Card,
+    ) -> None:
+        self._card = card
+
+    def create_card(self, theme: str, instructions: str) -> Card:
+        return self._card.model_copy()
