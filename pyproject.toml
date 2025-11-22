@@ -7,7 +7,9 @@ authors = [
     { name = "erwan serandour", email = "e.serandour@hispeed.ch" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pydantic>=2.12.4",
+]
 
 [project.scripts]
 anki-scroll = "anki_scroll:main"
