@@ -1,0 +1,41 @@
+codex follow the instructions below
+
+you can find the mock for each page in mock-anki-scroll
+you should use a the services
+below you will find instructions to implement each page
+
+start-screen:
+
+route: home/
+mock: start-screen.png
+
+clicking on a deck open deck_view
+clicking on new deck open modal with the title of the deck
+
+
+deck view:
+
+route: deck/deck-id
+mock: deck_view.png  
+
+show a list of the cards each card also has a delete button
+clicking on add cards open the create cards window
+
+create cards:
+
+It composed of two steps, defining the spec for the cards and then selecting them.
+
+create spec
+
+route: create_card/deck-id/spec-id?
+mock: create-cards.png
+
+you can give instructions about the cards
+when you click on generate cards you open the select window
+
+route: select/deck-id/spec-id
+mock: select-cards.png  
+
+there are small difference with respect to the mock up
+you can only pass to the next or select the current card
+you can go back to the spec ot edit it and create a new one
