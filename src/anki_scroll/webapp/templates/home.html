@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="home-layout">
+    <section class="deck-column">
+        <h2>Choose a deck</h2>
+        <div class="deck-scroll" role="list">
+            {% for deck in decks %}
+            <div class="card deck-card" role="listitem">
+                <h3>{{ deck.name }}</h3>
+                <p>{{ deck.count }} cards ready</p>
+                <a href="{{ request.url_for('deck_view', deck_id=deck.id) }}">Open deck</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card new-deck-card" aria-live="polite">
+            <h3>New deck</h3>
+            <p>Set the deck title to start planning cards.</p>
+            <form method="post" action="{{ request.url_for('create_deck') }}">
+                <label for="deck-name">Deck title</label>
+                <input id="deck-name" name="name" placeholder="Biology" required>
+                <div class="actions" style="margin-top: 0.5rem;">
+                    <button type="submit">Create deck</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

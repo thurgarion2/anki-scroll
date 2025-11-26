@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ deck_name }}</h2>
+<div class="actions" style="margin-bottom: 1rem;">
+    <a href="{{ request.url_for('create_spec', deck_id=deck_id) }}">Add cards</a>
+</div>
+
+{% if cards %}
+    {% for card in cards %}
+    <div class="card">
+        <h3>{{ card.question }}</h3>
+        <p>{{ card.answer }}</p>
+        <form method="post" action="{{ request.url_for('delete_card', deck_id=deck_id) }}">
+            <input type="hidden" name="question" value="{{ card.question }}">
+            <input type="hidden" name="answer" value="{{ card.answer }}">
+            <button type="submit" class="danger">Delete</button>
+        </form>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No cards yet. Use "Add cards" to generate new ones.</p>
+{% endif %}
+{% endblock %}

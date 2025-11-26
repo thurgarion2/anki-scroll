@@ -1,5 +1,3 @@
-codex follow the instructions below
-
 you can find the mock for each page in mock-anki-scroll
 you should use a the services
 below you will find instructions to implement each page

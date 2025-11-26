@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Select cards for {{ spec.theme or 'your deck' }}</h2>
+
+<div class="card">
+    <h3>{{ card.question }}</h3>
+    <p>{{ card.answer }}</p>
+    <div class="actions" style="margin-top: 1rem;">
+        <form method="post" action="{{ request.url_for('select_card', deck_id=deck_id, spec_id=spec.id) }}">
+            <input type="hidden" name="question" value="{{ card.question }}">
+            <input type="hidden" name="answer" value="{{ card.answer }}">
+            <button type="submit">Select card</button>
+        </form>
+        <a class="button secondary" href="{{ request.url_for('select_cards', deck_id=deck_id, spec_id=spec.id) }}">Next</a>
+    </div>
+</div>
+
+<p><a href="{{ request.url_for('create_spec', deck_id=deck_id) }}?spec_id={{ spec.id }}">Edit the spec</a></p>
+{% endblock %}

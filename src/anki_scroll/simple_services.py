@@ -7,8 +7,16 @@ from __future__ import annotations
 from collections.abc import Iterator
 from hashlib import sha256
 from typing import Dict
+from uuid import uuid4
 
-from anki_scroll.services import Card, CardGenerator, Deck, DeckService
+from anki_scroll.services import (
+    Card,
+    CardGenerator,
+    CardSpec,
+    CardSpecService,
+    Deck,
+    DeckService,
+)
 
 class SimpleDeck(Deck):
     """simple in-memory deck implementation"""
@@ -38,16 +46,51 @@ class SimpleDeck(Deck):
 
 
 class SimpleCardGenerator(CardGenerator):
-    """a simple gnerator that generate always the same card"""
+    """Deterministic placeholder generator based on the spec."""
 
-    def __init__(
-        self,
-        card: Card,
-    ) -> None:
-        self._card = card
+    def __init__(self) -> None:
+        self._counter = 0
 
     def create_card(self, theme: str, instructions: str) -> Card:
-        return self._card.model_copy()
+        self._counter += 1
+        theme_text = theme.strip() or "General"
+        instruction_text = instructions.strip() or "Review the basics"
+        question = f"{theme_text} concept {self._counter}"
+        answer = f"{instruction_text} — detail {self._counter}"
+        return Card(question=question, answer=answer)
+
+
+class SimpleCardSpecService(CardSpecService):
+    """In-memory storage for card specifications."""
+
+    def __init__(self) -> None:
+        self._specs: Dict[str, CardSpec] = {}
+
+    def save(
+        self,
+        deck_id: str,
+        theme: str,
+        instructions: str,
+        spec_id: str | None = None,
+    ) -> CardSpec:
+        spec_key = spec_id or str(uuid4())
+        spec = self._specs.get(spec_key)
+        if spec is None:
+            spec = CardSpec(
+                id=spec_key,
+                deck_id=deck_id,
+                theme=theme.strip(),
+                instructions=instructions.strip(),
+            )
+        else:
+            spec.deck_id = deck_id
+            spec.theme = theme.strip()
+            spec.instructions = instructions.strip()
+        self._specs[spec_key] = spec
+        return spec
+
+    def get(self, spec_id: str) -> CardSpec | None:
+        return self._specs.get(spec_id)
     
 class SimpleDeckService(DeckService):
     """

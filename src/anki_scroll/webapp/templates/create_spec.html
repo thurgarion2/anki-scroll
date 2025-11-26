@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Card spec</h2>
+<p>Describe the theme and any extra instructions for the cards you want to create.</p>
+
+<div class="card">
+    <form method="post" action="{{ request.url_for('save_spec', deck_id=deck_id) }}">
+        {% if spec %}
+        <input type="hidden" name="spec_id" value="{{ spec.id }}">
+        {% endif %}
+        <label for="theme">Theme</label>
+        <input id="theme" name="theme" placeholder="Photosynthesis" value="{{ spec.theme if spec else '' }}" required>
+
+        <label for="instructions" style="margin-top: 1rem;">Instructions</label>
+        <textarea id="instructions" name="instructions" rows="4" placeholder="Focus on high-level ideas">{{ spec.instructions if spec else '' }}</textarea>
+
+        <div class="actions" style="margin-top: 1rem;">
+            <button type="submit">Generate cards</button>
+        </div>
+    </form>
+</div>
+
+<p style="margin-top: 1rem;"><a href="{{ request.url_for('deck_view', deck_id=deck_id) }}">Back to deck</a></p>
+{% endblock %}

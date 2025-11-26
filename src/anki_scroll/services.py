@@ -1,6 +1,8 @@
-from pydantic import BaseModel
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Iterator, Optional
+
+from pydantic import BaseModel
 
 
 class Card(BaseModel):
@@ -8,6 +10,16 @@ class Card(BaseModel):
     question: str
     answer: str
     
+
+@dataclass
+class CardSpec:
+    """Card generation instructions selected by the user."""
+
+    id: str
+    deck_id: str
+    theme: str
+    instructions: str
+
 
 class Deck(ABC):
     
@@ -51,6 +63,24 @@ class CardGenerator(ABC):
         raise NotImplementedError
     
 
+class CardSpecService(ABC):
+    """Storage and retrieval for card specifications."""
+
+    @abstractmethod
+    def save(
+        self,
+        deck_id: str,
+        theme: str,
+        instructions: str,
+        spec_id: Optional[str] = None,
+    ) -> CardSpec:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get(self, spec_id: str) -> Optional[CardSpec]:
+        raise NotImplementedError
+
+
 class DeckService(ABC):
     """
     Implement access and modification to all the decks in the app.
@@ -78,4 +108,3 @@ class DeckService(ABC):
     
     
     
-
