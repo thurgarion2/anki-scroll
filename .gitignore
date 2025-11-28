@@ -9,5 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# ide config
+/.vscode
+
 # temporary folders
 mock-anki-scroll/
+data/

@@ -22,6 +22,9 @@ from anki_scroll.simple_services import (
     SimpleCardSpecService,
     SimpleDeckService,
 )
+from anki_scroll.sql_service import (
+    SqlDeckService
+)
 
 
 TEMPLATES_DIR = Path(__file__).with_name("templates")
@@ -49,7 +52,7 @@ class WebState:
         card_spec_service: Optional[CardSpecService] = None,
         card_generator: Optional[CardGenerator] = None,
     ) -> None:
-        self.deck_service = deck_service or SimpleDeckService()
+        self.deck_service = deck_service or SqlDeckService()
         self.card_spec_service = card_spec_service or SimpleCardSpecService()
         self.card_generator = card_generator or SimpleCardGenerator()
         self._bootstrap()
