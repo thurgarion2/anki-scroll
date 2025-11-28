@@ -2,7 +2,6 @@ import unittest
 
 import httpx
 
-from anki_scroll.simple_services import SimpleDeck
 from anki_scroll.webapp import DEFAULT_DECK_NAME, WebState, build_app
 
 
@@ -12,7 +11,12 @@ class WebAppTests(unittest.IsolatedAsyncioTestCase):
         self.app = build_app(state)
         transport = httpx.ASGITransport(app=self.app)
         self.client = httpx.AsyncClient(transport=transport, base_url="http://test")
-        self.default_deck_id = SimpleDeck(DEFAULT_DECK_NAME).id()
+        default_deck = next(
+            deck
+            for deck in state.deck_service.decks()
+            if deck.name() == DEFAULT_DECK_NAME
+        )
+        self.default_deck_id = default_deck.id()
 
     async def asyncTearDown(self):
         await self.client.aclose()

@@ -41,30 +41,40 @@ class TestSimpleDeck(unittest.TestCase):
 class TestSimpleDeckService(unittest.TestCase):
     def test_decks(self):
         service = SimpleDeckService()
-        deck = SimpleDeck("one")
-        service.add_deck(deck)
+        deck = service.create_deck("one")
+        self.assertIsNotNone(deck)
         self.assertIn(deck, list(service.decks()))
 
     def test_get_deck(self):
         service = SimpleDeckService()
-        deck = SimpleDeck("two")
-        service.add_deck(deck)
+        deck = service.create_deck("two")
+        self.assertIsNotNone(deck)
         self.assertIs(service.get_deck(deck.id()), deck)
 
     def test_add_deck(self):
         service = SimpleDeckService()
-        deck_a = SimpleDeck("shared")
-        deck_b = SimpleDeck("shared")
+        helper_service = SimpleDeckService()
+        deck_a = helper_service.create_deck("shared")
+        self.assertIsNotNone(deck_a)
+        deck_b = SimpleDeckService().create_deck("shared")
+        self.assertIsNotNone(deck_b)
         service.add_deck(deck_a)
         service.add_deck(deck_b)
         self.assertIs(service.get_deck(deck_a.id()), deck_a)
 
     def test_remove_deck(self):
         service = SimpleDeckService()
-        deck = SimpleDeck("temp")
-        service.add_deck(deck)
+        deck = service.create_deck("temp")
+        self.assertIsNotNone(deck)
         service.remove_deck(deck.id())
         self.assertIsNone(service.get_deck(deck.id()))
+
+    def test_create_deck_existing_returns_none(self):
+        service = SimpleDeckService()
+        first = service.create_deck("duplicate")
+        self.assertIsNotNone(first)
+        second = service.create_deck("duplicate")
+        self.assertIsNone(second)
 
 
 if __name__ == "__main__":

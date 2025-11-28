@@ -20,7 +20,6 @@ from anki_scroll.services import (
 from anki_scroll.simple_services import (
     SimpleCardGenerator,
     SimpleCardSpecService,
-    SimpleDeck,
     SimpleDeckService,
 )
 
@@ -30,6 +29,15 @@ STATIC_DIR = Path(__file__).with_name("static")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 DEFAULT_DECK_NAME = "Explorer Deck"
+
+
+def _find_deck_by_name(deck_service: DeckService, deck_name: str) -> Deck | None:
+    """Locate a deck by its name, ignoring surrounding whitespace."""
+    normalized = deck_name.strip()
+    for deck in deck_service.decks():
+        if deck.name() == normalized:
+            return deck
+    return None
 
 
 class WebState:
@@ -47,7 +55,9 @@ class WebState:
         self._bootstrap()
 
     def _bootstrap(self) -> None:
-        deck = SimpleDeck(DEFAULT_DECK_NAME)
+        deck = self.deck_service.create_deck(DEFAULT_DECK_NAME)
+        if deck is None:
+            return
         deck.add(Card(question="What is spaced repetition?", answer="A study technique."))
         deck.add(
             Card(
@@ -55,12 +65,11 @@ class WebState:
                 answer="They reinforce active recall.",
             )
         )
-        self.deck_service.add_deck(deck)
 
     def save_spec(
-        self, deck_id: str, theme: str, instructions: str, spec_id: Optional[str] = None
+        self, deck_id: str, theme: str, instructions: str
     ) -> CardSpec:
-        spec = self.card_spec_service.save(deck_id, theme, instructions, spec_id)
+        spec = self.card_spec_service.save(deck_id, theme, instructions)
         return spec
 
     def get_spec(self, spec_id: str) -> CardSpec|None:
@@ -109,13 +118,9 @@ def build_app(state: Optional[WebState] = None) -> FastAPI:
     async def create_deck(request: Request, name: str = Form(...)) -> RedirectResponse:
         state = _get_state(request)
         deck_name = name.strip()
-        candidate = SimpleDeck(deck_name)
-        existing = state.deck_service.get_deck(candidate.id())
-        if existing is None:
-            state.deck_service.add_deck(candidate)
-            target = candidate
-        else:
-            target = existing
+        target = state.deck_service.create_deck(deck_name)
+        if target is None:
+            raise HTTPException(status_code=403, detail="Deck already exists")
         return RedirectResponse(url=f"/deck/{target.id()}", status_code=303)
 
     @app.get("/deck/{deck_id}", response_class=HTMLResponse)
@@ -174,11 +179,10 @@ def build_app(state: Optional[WebState] = None) -> FastAPI:
         deck_id: str,
         theme: str = Form(""),
         instructions: str = Form(""),
-        spec_id: Optional[str] = Form(None),
     ) -> RedirectResponse:
         state = _get_state(request)
         _get_deck_or_404(state, deck_id)
-        spec = state.save_spec(deck_id, theme, instructions, spec_id)
+        spec = state.save_spec(deck_id, theme, instructions)
         return RedirectResponse(
             url=f"/select/{deck_id}/{spec.id}", status_code=303
         )

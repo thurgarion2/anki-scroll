@@ -24,6 +24,14 @@ class CardSpec:
 class Deck(ABC):
     
     @abstractmethod
+    def __init__(self) -> None:
+        """
+        Init method should never be used to create a deck.
+        Always use DeckService.create_deck.
+        """
+        raise NotImplementedError
+    
+    @abstractmethod
     def name(self) -> str:
         raise NotImplementedError
     
@@ -72,7 +80,6 @@ class CardSpecService(ABC):
         deck_id: str,
         theme: str,
         instructions: str,
-        spec_id: Optional[str] = None,
     ) -> CardSpec:
         raise NotImplementedError
 
@@ -100,6 +107,11 @@ class DeckService(ABC):
         Add a deck to the app if the deck is already present.
         Only 1 instance of each deck will be stored by the app.
         """
+        raise NotImplementedError
+    
+    @abstractmethod
+    def create_deck(self, name: str) -> Deck | None:
+        """Create a deck unless it already exists."""
         raise NotImplementedError
     
     @abstractmethod

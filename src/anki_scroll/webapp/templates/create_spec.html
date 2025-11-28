@@ -6,9 +6,6 @@
 
 <div class="card">
     <form method="post" action="{{ request.url_for('save_spec', deck_id=deck_id) }}">
-        {% if spec %}
-        <input type="hidden" name="spec_id" value="{{ spec.id }}">
-        {% endif %}
         <label for="theme">Theme</label>
         <input id="theme" name="theme" placeholder="Photosynthesis" value="{{ spec.theme if spec else '' }}" required>
 

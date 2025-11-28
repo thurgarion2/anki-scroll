@@ -71,21 +71,14 @@ class SimpleCardSpecService(CardSpecService):
         deck_id: str,
         theme: str,
         instructions: str,
-        spec_id: str | None = None,
     ) -> CardSpec:
-        spec_key = spec_id or str(uuid4())
-        spec = self._specs.get(spec_key)
-        if spec is None:
-            spec = CardSpec(
-                id=spec_key,
-                deck_id=deck_id,
-                theme=theme.strip(),
-                instructions=instructions.strip(),
-            )
-        else:
-            spec.deck_id = deck_id
-            spec.theme = theme.strip()
-            spec.instructions = instructions.strip()
+        spec_key = str(uuid4())
+        spec = CardSpec(
+            id=spec_key,
+            deck_id=deck_id,
+            theme=theme.strip(),
+            instructions=instructions.strip(),
+        )
         self._specs[spec_key] = spec
         return spec
 
@@ -110,6 +103,17 @@ class SimpleDeckService(DeckService):
     def add_deck(self, deck: Deck):
         if deck.id() not in self._decks:
             self._decks[deck.id()] = deck
+    
+    def create_deck(self, name: str) -> Deck | None:
+        """Create a deck unless it already exists."""
+        deck_name = name.strip()
+        candidate = SimpleDeck(deck_name)
+        deck_id = candidate.id()
+        existing = self._decks.get(deck_id)
+        if existing is not None:
+            return None
+        self._decks[deck_id] = candidate
+        return candidate
 
     def remove_deck(self, id: str):
         self._decks.pop(id, None)
