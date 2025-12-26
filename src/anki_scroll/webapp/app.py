@@ -25,6 +25,7 @@ from anki_scroll.simple_services import (
 from anki_scroll.sql_service import (
     SqlDeckService
 )
+from anki_scroll.service.card_generation import LLMCardGeneration
 
 
 TEMPLATES_DIR = Path(__file__).with_name("templates")
@@ -54,7 +55,7 @@ class WebState:
     ) -> None:
         self.deck_service = deck_service or SqlDeckService()
         self.card_spec_service = card_spec_service or SimpleCardSpecService()
-        self.card_generator = card_generator or SimpleCardGenerator()
+        self.card_generator = card_generator or LLMCardGeneration()
         self._bootstrap()
 
     def _bootstrap(self) -> None:

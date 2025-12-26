@@ -15,3 +15,7 @@ wheels/
 # temporary folders
 mock-anki-scroll/
 data/
+
+# mflow
+./mydb.sqlite
+
